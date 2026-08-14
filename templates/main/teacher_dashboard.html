@@ -1,0 +1,53 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Submissions | Writing Feedback Portal{% endblock %}
+
+{% block topbar_links %}
+<a href="{% url 'teacher_dashboard' %}">Submissions</a>
+{% endblock %}
+
+{% block content %}
+<div class="view-header">
+  <div>
+    <span class="view-eyebrow">Submissions</span>
+    <h1>Submissions</h1>
+    <p class="view-sub">Inspect essays, leave comments, and finalize grades.</p>
+  </div>
+  <div class="view-meta">
+    <strong>{{ pending_count }}</strong>
+    <span>Awaiting review</span>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+{% if submissions %}
+  <div class="submission-list">
+    {% for s in submissions %}
+      <a href="{% url 'review_submission' s.id %}" class="submission-row">
+        <div>
+          <div class="submission-title">{{ s.title }}</div>
+          <div class="submission-course">{{ s.student.get_full_name|default:s.student.username }}</div>
+        </div>
+        <div class="submission-date">{{ s.created_at|date:"M j, Y" }}</div>
+        <div class="submission-count"><strong>{{ s.comment_count }}</strong> comments</div>
+        <div>
+          {% if s.status == 'submitted' %}
+            <span class="tag tag-review">Awaiting review</span>
+          {% elif s.status == 'in_review' %}
+            <span class="tag tag-marked">In review</span>
+          {% elif s.status == 'reviewed' %}
+            <span class="tag tag-resolved">Reviewed</span>
+          {% endif %}
+        </div>
+      </a>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="empty-state">
+    <h3>You're all caught up</h3>
+    <p>No submissions are currently awaiting review.</p>
+  </div>
+{% endif %}
+
+{% endblock %}

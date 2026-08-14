@@ -1,0 +1,857 @@
+/* ==========================================================================
+   Writing Feedback Portal — design tokens
+   Palette: paper + ink, with a brick-red "mark" accent reserved for
+   annotations/marginalia — the one place the page allows itself color.
+   ========================================================================== */
+
+:root {
+    /* Surfaces */
+    --paper: #ece8de;
+    --paper-raised: #f8f6ef;
+    --paper-sunken: #e2ddd0;
+    /* Ink */
+    --ink: #1c2333;
+    --ink-soft: #565f72;
+    --ink-faint: #8a8f9e;
+    /* Structure */
+    --rule: #d9d2c0;
+    --rule-strong: #c3bba5;
+    /* Accents — used sparingly, each with one job */
+    --mark: #a8402a;
+    /* the red pen: annotations, corrections, errors */
+    --mark-soft: #f1ded7;
+    /* pale wash of mark, for backgrounds/badges */
+    --gold: #a67a1e;
+    /* in review / pending */
+    --gold-soft: #f0e6cd;
+    --sage: #4c7a5e;
+    /* approved / resolved */
+    --sage-soft: #dde9e1;
+    /* Type */
+    --font-display: "Fraunces", Georgia, serif;
+    --font-body: "Manrope", -apple-system, BlinkMacSystemFont, sans-serif;
+    /* Rhythm */
+    --radius: 4px;
+    --radius-lg: 8px;
+    --shadow-card: 0 1px 2px rgba(28, 35, 51, 0.06), 0 6px 20px -8px rgba(28, 35, 51, 0.12);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    -webkit-text-size-adjust: 100%;
+}
+
+body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+}
+
+
+/* Subtle paper texture: a near-invisible fiber grain so the background
+   isn't a flat color block. Pure CSS, no image request. */
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+    background-image: radial-gradient(circle at 20% 30%, rgba(28, 35, 51, 0.015) 0, transparent 40%), radial-gradient(circle at 80% 70%, rgba(28, 35, 51, 0.015) 0, transparent 40%);
+}
+
+a {
+    color: inherit;
+}
+
+h1,
+h2,
+h3,
+h4 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    line-height: 1.15;
+    margin: 0;
+    color: var(--ink);
+}
+
+p {
+    margin: 0;
+}
+
+button,
+input,
+select,
+textarea {
+    font-family: inherit;
+}
+
+:focus-visible {
+    outline: 2px solid var(--mark);
+    outline-offset: 2px;
+}
+
+
+/* ==========================================================================
+   Shell + topbar
+   ========================================================================== */
+
+.shell {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 20px 40px;
+    border-bottom: 1px solid var(--rule);
+    background: var(--paper-raised);
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: var(--ink);
+}
+
+.brand-mark {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius);
+    background: var(--ink);
+    color: var(--paper-raised);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.02em;
+}
+
+.brand strong {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.brand small {
+    display: block;
+    font-size: 12px;
+    color: var(--ink-soft);
+    font-weight: 500;
+}
+
+.topbar-links {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.topbar-links a {
+    text-decoration: none;
+    color: var(--ink-soft);
+    border-bottom: 1px solid transparent;
+    padding-bottom: 2px;
+    transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.topbar-links a:hover {
+    color: var(--mark);
+    border-color: var(--mark);
+}
+
+.page {
+    flex: 1;
+    width: 100%;
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 48px 40px 80px;
+}
+
+
+/* ==========================================================================
+   Flash messages
+   ========================================================================== */
+
+.flash-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 32px;
+}
+
+.flash {
+    padding: 12px 16px;
+    border-radius: var(--radius);
+    font-size: 14px;
+    font-weight: 600;
+    border: 1px solid transparent;
+}
+
+.flash-success {
+    background: var(--sage-soft);
+    color: #2f5642;
+    border-color: #c1d8ca;
+}
+
+.flash-error {
+    background: var(--mark-soft);
+    color: #7c2e1d;
+    border-color: #e3c1b6;
+}
+
+.flash-warning {
+    background: var(--gold-soft);
+    color: #7a5a11;
+    border-color: #ddc890;
+}
+
+.flash-info,
+.flash-debug {
+    background: var(--paper-sunken);
+    color: var(--ink-soft);
+    border-color: var(--rule-strong);
+}
+
+
+/* ==========================================================================
+   Page header
+   ========================================================================== */
+
+.view-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 8px;
+}
+
+.view-eyebrow {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--mark);
+    margin-bottom: 10px;
+    display: block;
+}
+
+.view-header h1 {
+    font-size: 34px;
+}
+
+.view-sub {
+    color: var(--ink-soft);
+    font-size: 15px;
+    margin-top: 10px;
+    max-width: 56ch;
+}
+
+.view-meta {
+    text-align: right;
+    font-size: 13px;
+    color: var(--ink-soft);
+    white-space: nowrap;
+}
+
+.view-meta strong {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 26px;
+    color: var(--ink);
+    font-weight: 700;
+}
+
+.divider {
+    height: 1px;
+    background: var(--rule);
+    border: 0;
+    margin: 28px 0 32px;
+}
+
+
+/* ==========================================================================
+   Status tags
+   ========================================================================== */
+
+.tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+}
+
+.tag::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.tag-review {
+    background: var(--gold-soft);
+    color: #8a6613;
+}
+
+.tag-marked {
+    background: var(--mark-soft);
+    color: var(--mark);
+}
+
+.tag-resolved {
+    background: var(--sage-soft);
+    color: #35604a;
+}
+
+
+/* ==========================================================================
+   Submission list
+   ========================================================================== */
+
+.submission-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.submission-row {
+    display: grid;
+    grid-template-columns: 1fr auto auto auto;
+    align-items: center;
+    gap: 20px;
+    padding: 20px 22px;
+    background: var(--paper-raised);
+    border: 1px solid var(--rule);
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.submission-row:first-child {
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+.submission-row:last-child {
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+}
+
+.submission-row+.submission-row {
+    border-top: none;
+}
+
+.submission-row:hover {
+    border-color: var(--rule-strong);
+    transform: translateX(2px);
+}
+
+.submission-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 17px;
+    margin-bottom: 4px;
+}
+
+.submission-course {
+    font-size: 13px;
+    color: var(--ink-soft);
+}
+
+.submission-date,
+.submission-count {
+    font-size: 13px;
+    color: var(--ink-soft);
+    text-align: right;
+}
+
+.submission-count strong {
+    color: var(--ink);
+    font-weight: 700;
+}
+
+.empty-state {
+    padding: 60px 20px;
+    text-align: center;
+    background: var(--paper-raised);
+    border: 1px dashed var(--rule-strong);
+    border-radius: var(--radius-lg);
+    color: var(--ink-soft);
+}
+
+.empty-state h3 {
+    font-size: 18px;
+    margin-bottom: 8px;
+    color: var(--ink);
+}
+
+
+/* ==========================================================================
+   Marginalia thread — the signature element.
+   A vertical rule with pin markers down the left edge of a feedback
+   list, standing in for a reader's pen marks down the margin of a page.
+   ========================================================================== */
+
+.manuscript {
+    background: var(--paper-raised);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-lg);
+    padding: 36px 40px;
+    box-shadow: var(--shadow-card);
+}
+
+.manuscript-body {
+    font-family: var(--font-display);
+    font-size: 17px;
+    line-height: 1.7;
+    color: var(--ink);
+    white-space: pre-wrap;
+}
+
+.manuscript-body mark {
+    background: var(--mark-soft);
+    color: var(--mark);
+    padding: 0 2px;
+    border-radius: 2px;
+}
+
+.marginalia {
+    position: relative;
+    margin-top: 44px;
+    padding-left: 28px;
+}
+
+.marginalia::before {
+    content: "";
+    position: absolute;
+    left: 6px;
+    top: 6px;
+    bottom: 6px;
+    width: 1px;
+    background: var(--rule-strong);
+}
+
+.marginalia-heading {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 20px;
+}
+
+.note {
+    position: relative;
+    padding: 4px 0 22px 22px;
+}
+
+.note::before {
+    content: "";
+    position: absolute;
+    left: -3px;
+    top: 8px;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--mark);
+    border: 2px solid var(--paper-raised);
+    box-shadow: 0 0 0 1px var(--mark);
+}
+
+.note.is-resolved::before {
+    background: var(--sage);
+    box-shadow: 0 0 0 1px var(--sage);
+}
+
+.note-meta {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 6px;
+    font-size: 12px;
+    color: var(--ink-faint);
+}
+
+.note-author {
+    font-weight: 700;
+    color: var(--ink);
+    font-size: 13px;
+}
+
+.note-text {
+    font-size: 14.5px;
+    color: var(--ink);
+    line-height: 1.6;
+}
+
+
+/* ==========================================================================
+   Buttons + form fields
+   ========================================================================== */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 20px;
+    border-radius: var(--radius);
+    font-size: 14px;
+    font-weight: 700;
+    border: 1px solid transparent;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+}
+
+.btn:active {
+    transform: translateY(1px);
+}
+
+.btn-primary {
+    background: var(--ink);
+    color: var(--paper-raised);
+}
+
+.btn-primary:hover {
+    background: #2b3448;
+}
+
+.btn-ghost {
+    background: transparent;
+    border-color: var(--rule-strong);
+    color: var(--ink);
+}
+
+.btn-ghost:hover {
+    border-color: var(--ink);
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 20px;
+}
+
+.field label {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+}
+
+.field textarea,
+.field input {
+    border: 1px solid var(--rule-strong);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    font-size: 14.5px;
+    background: var(--paper-raised);
+    color: var(--ink);
+}
+
+.field textarea:focus,
+.field input:focus {
+    border-color: var(--mark);
+}
+
+
+/* ==========================================================================
+   Auth card (centered single-column card used across auth pages)
+   ========================================================================== */
+
+.auth-wrapper {
+    display: grid;
+    place-items: start center;
+    min-height: calc(100vh - 160px);
+    padding-top: 28px;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 420px;
+    background: var(--paper-raised);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    padding: 28px;
+}
+
+.auth-card .heading {
+    margin-bottom: 8px;
+}
+
+.auth-card .subheading {
+    color: var(--ink-soft);
+    margin-bottom: 18px;
+    font-size: 14px;
+}
+
+.auth-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-top: 6px;
+}
+
+.quiet-link {
+    color: var(--ink-soft);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.quiet-link:hover {
+    color: var(--ink);
+    text-decoration: underline;
+}
+
+
+/* ==========================================================================
+   Stat cards (institution dashboard, overview metrics)
+   ========================================================================== */
+
+.stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 2px;
+    margin-bottom: 40px;
+}
+
+.stat-card {
+    background: var(--paper-raised);
+    border: 1px solid var(--rule);
+    padding: 22px 20px;
+}
+
+.stat-card:first-child {
+    border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+}
+
+.stat-card:last-child {
+    border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+}
+
+.stat-card+.stat-card {
+    border-left: none;
+}
+
+.stat-card strong {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 4px;
+}
+
+.stat-card span {
+    font-size: 13px;
+    color: var(--ink-soft);
+    font-weight: 600;
+}
+
+@media (max-width: 720px) {
+    .stat-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+    .stat-card,
+    .stat-card:first-child,
+    .stat-card:last-child {
+        border-radius: var(--radius);
+        border-left: 1px solid var(--rule);
+    }
+}
+
+
+/* ==========================================================================
+   Section headings + panels (institution dashboard)
+   ========================================================================== */
+
+.section-heading {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.section-heading h2 {
+    font-size: 20px;
+}
+
+.section-heading .count {
+    font-size: 13px;
+    color: var(--ink-soft);
+    font-weight: 600;
+}
+
+.panel {
+    background: var(--paper-raised);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    padding: 28px 30px;
+    margin-bottom: 40px;
+}
+
+
+/* ==========================================================================
+   Simple data table (user management, review activity)
+   ========================================================================== */
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.data-table th {
+    text-align: left;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    padding: 0 12px 10px;
+    border-bottom: 1px solid var(--rule-strong);
+}
+
+.data-table td {
+    padding: 12px;
+    border-bottom: 1px solid var(--rule);
+    vertical-align: middle;
+}
+
+.data-table tr:last-child td {
+    border-bottom: none;
+}
+
+.role-badge {
+    display: inline-block;
+    padding: 3px 9px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    background: var(--paper-sunken);
+    color: var(--ink-soft);
+}
+
+.role-badge.role-teacher {
+    background: var(--gold-soft);
+    color: #8a6613;
+}
+
+.status-dot {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.status-dot::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--sage);
+}
+
+.status-dot.is-inactive::before {
+    background: var(--ink-faint);
+}
+
+.status-dot.is-inactive {
+    color: var(--ink-faint);
+}
+
+.btn-small {
+    padding: 6px 12px;
+    font-size: 12.5px;
+}
+
+.tab-strip {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--rule);
+}
+
+.tab-strip a {
+    padding: 10px 16px;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--ink-soft);
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+}
+
+.tab-strip a.is-active {
+    color: var(--ink);
+    border-color: var(--mark);
+}
+
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+
+@media (max-width: 720px) {
+    .topbar {
+        padding: 16px 20px;
+    }
+    .page {
+        padding: 32px 20px 60px;
+    }
+    .view-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .view-meta {
+        text-align: left;
+    }
+    .submission-row {
+        grid-template-columns: 1fr;
+        gap: 6px;
+        text-align: left;
+    }
+    .submission-date,
+    .submission-count {
+        text-align: left;
+    }
+    .manuscript {
+        padding: 24px 22px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        transition: none !important;
+    }
+}

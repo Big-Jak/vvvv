@@ -1,0 +1,164 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Institution overview | Writing Feedback Portal{% endblock %}
+
+{% block content %}
+<div class="view-header">
+  <div>
+    <span class="view-eyebrow">Institution</span>
+    <h1>Institution overview</h1>
+    <p class="view-sub">Organization-wide activity, account management, and teacher review oversight.</p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<div class="stat-grid">
+  <div class="stat-card"><strong>{{ total_users }}</strong><span>Total users</span></div>
+  <div class="stat-card"><strong>{{ total_teachers }}</strong><span>Teachers</span></div>
+  <div class="stat-card"><strong>{{ total_students }}</strong><span>Students</span></div>
+  <div class="stat-card"><strong>{{ total_submissions }}</strong><span>Submissions</span></div>
+  <div class="stat-card"><strong>{{ pending_review }}</strong><span>Awaiting review</span></div>
+</div>
+
+<div class="panel">
+  <div class="section-heading">
+    <h2>Create an account</h2>
+  </div>
+  <form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="create_user">
+    <div class="field">
+      {{ create_user_form.username.label_tag }}
+      {{ create_user_form.username }}
+    </div>
+    <div class="field">
+      {{ create_user_form.email.label_tag }}
+      {{ create_user_form.email }}
+    </div>
+    <div class="field">
+      {{ create_user_form.role.label_tag }}
+      {{ create_user_form.role }}
+    </div>
+    <div class="field">
+      {{ create_user_form.password.label_tag }}
+      {{ create_user_form.password }}
+    </div>
+    <div class="field">
+      {{ create_user_form.confirm_password.label_tag }}
+      {{ create_user_form.confirm_password }}
+    </div>
+    <button type="submit" class="btn btn-primary">Create account</button>
+  </form>
+</div>
+
+<div class="panel">
+  <div class="section-heading">
+    <h2>Teachers</h2>
+    <span class="count">{{ teachers|length }}</span>
+  </div>
+  {% if teachers %}
+  <table class="data-table">
+    <thead>
+      <tr><th>Name</th><th>Username</th><th>Email</th><th>Status</th><th></th></tr>
+    </thead>
+    <tbody>
+      {% for t in teachers %}
+      <tr>
+        <td>{{ t.get_full_name|default:"—" }}</td>
+        <td>{{ t.username }}</td>
+        <td>{{ t.email }}</td>
+        <td>
+          {% if t.is_active %}
+          <span class="status-dot">Active</span>
+          {% else %}
+          <span class="status-dot is-inactive">Deactivated</span>
+          {% endif %}
+        </td>
+        <td>
+          <form method="post" style="display:inline;">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="toggle_active">
+            <input type="hidden" name="user_id" value="{{ t.id }}">
+            <button type="submit" class="btn btn-ghost btn-small">{% if t.is_active %}Deactivate{% else %}Activate{% endif %}</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p style="color:var(--ink-soft); font-size:14px;">No teacher accounts yet.</p>
+  {% endif %}
+</div>
+
+<div class="panel">
+  <div class="section-heading">
+    <h2>Students</h2>
+    <span class="count">{{ students|length }}</span>
+  </div>
+  {% if students %}
+  <table class="data-table">
+    <thead>
+      <tr><th>Name</th><th>Username</th><th>Email</th><th>Status</th><th></th></tr>
+    </thead>
+    <tbody>
+      {% for st in students %}
+      <tr>
+        <td>{{ st.get_full_name|default:"—" }}</td>
+        <td>{{ st.username }}</td>
+        <td>{{ st.email }}</td>
+        <td>
+          {% if st.is_active %}
+          <span class="status-dot">Active</span>
+          {% else %}
+          <span class="status-dot is-inactive">Deactivated</span>
+          {% endif %}
+        </td>
+        <td>
+          <form method="post" style="display:inline;">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="toggle_active">
+            <input type="hidden" name="user_id" value="{{ st.id }}">
+            <button type="submit" class="btn btn-ghost btn-small">{% if st.is_active %}Deactivate{% else %}Activate{% endif %}</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p style="color:var(--ink-soft); font-size:14px;">No student accounts yet.</p>
+  {% endif %}
+</div>
+
+<div class="panel">
+  <div class="section-heading">
+    <h2>Recent teacher reviews</h2>
+    <span class="count">{{ recent_reviews|length }}</span>
+  </div>
+  {% if recent_reviews %}
+  <table class="data-table">
+    <thead>
+      <tr><th>Submission</th><th>Student</th><th>Reviewed by</th><th>Score</th><th>When</th><th></th></tr>
+    </thead>
+    <tbody>
+      {% for r in recent_reviews %}
+      <tr>
+        <td>{{ r.title }}</td>
+        <td>{{ r.student.username }}</td>
+        <td>{{ r.reviewed_by.get_full_name|default:r.reviewed_by.username|default:"—" }}</td>
+        <td>{{ r.display_score }}/100</td>
+        <td>{{ r.reviewed_at|date:"M j, Y" }}</td>
+        <td><a class="quiet-link" href="{% url 'submission_detail' r.id %}">View</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p style="color:var(--ink-soft); font-size:14px;">No reviews have been completed yet.</p>
+  {% endif %}
+</div>
+
+<p><a href="/admin/" class="quiet-link">Advanced administration (Django admin) &rarr;</a></p>
+{% endblock %}

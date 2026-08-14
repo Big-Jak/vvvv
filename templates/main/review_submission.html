@@ -1,0 +1,83 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Review: {{ submission.title }} | Writing Feedback Portal{% endblock %}
+
+{% block topbar_links %}
+<a href="{% url 'teacher_dashboard' %}">Submissions</a>
+{% endblock %}
+
+{% block content %}
+<div class="view-header">
+  <div>
+    <span class="view-eyebrow">Reviewing</span>
+    <h1>{{ submission.title }}</h1>
+    <p class="view-sub">Submitted by {{ submission.student.get_full_name|default:submission.student.username }} ({{ submission.student.username }}) on {{ submission.created_at|date:"M j, Y" }}</p>
+  </div>
+  <div class="view-meta">
+    <strong>{{ submission.display_score }}</strong>
+    <span>Current score</span>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<div class="manuscript">
+  <div class="manuscript-body">{{ submission.content }}</div>
+</div>
+
+<div style="margin-top:28px;">
+  <h3 style="font-size:17px; margin-bottom:14px;">AI-generated feedback</h3>
+  <div class="manuscript">
+    <div class="manuscript-body">{{ submission.feedback|linebreaksbr }}</div>
+  </div>
+</div>
+
+<div style="margin-top:28px;">
+  <h3 style="font-size:17px; margin-bottom:14px;">Official review</h3>
+  <div class="manuscript">
+    <form method="post">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="save_review">
+      <div class="field">
+        <label for="id_teacher_score">Final score (0-100)</label>
+        <input type="number" id="id_teacher_score" name="teacher_score" min="0" max="100"
+               value="{% if submission.teacher_score is not None %}{{ submission.teacher_score }}{% else %}{{ submission.score }}{% endif %}">
+      </div>
+      <div class="field">
+        <label for="id_teacher_feedback">Written assessment</label>
+        <textarea id="id_teacher_feedback" name="teacher_feedback" rows="8"
+                  placeholder="This replaces the AI feedback as the official grade the student sees. Leave blank to keep the AI feedback as final.">{{ submission.teacher_feedback|default:"" }}</textarea>
+      </div>
+      <button type="submit" class="btn btn-primary">Save review &amp; notify student</button>
+    </form>
+  </div>
+</div>
+
+<div class="marginalia" style="margin-top:36px;">
+  <div class="marginalia-heading">Comment thread ({{ comments|length }})</div>
+
+  {% for c in comments %}
+  <div class="note">
+    <div class="note-meta">
+      <span class="note-author">{{ c.author.get_full_name|default:c.author.username }}</span>
+      <span>{{ c.created_at|date:"M j, Y g:i A" }}</span>
+    </div>
+    <div class="note-text">{{ c.body|linebreaksbr }}</div>
+  </div>
+  {% empty %}
+  <p style="color:var(--ink-soft); font-size:14px;">No comments yet. Leave one below — the student can see this thread.</p>
+  {% endfor %}
+
+  <form method="post" style="margin-top:10px;">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="comment">
+    <div class="field">
+      <label for="id_comment_body">Add a comment</label>
+      <textarea id="id_comment_body" name="comment_body" rows="3" placeholder="Leave a note for the student..." required></textarea>
+    </div>
+    <button type="submit" class="btn btn-ghost">Post comment</button>
+  </form>
+</div>
+
+<p style="margin-top:32px;"><a class="quiet-link" href="{% url 'teacher_dashboard' %}">&larr; Back to submissions</a></p>
+{% endblock %}

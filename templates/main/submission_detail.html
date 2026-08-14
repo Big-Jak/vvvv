@@ -1,0 +1,66 @@
+{% extends 'main/base.html' %}
+{% block title %}{{ s.title }} | Writing Feedback Portal{% endblock %}
+{% block content %}
+<div class="view-header">
+    <div>
+        <span class="view-eyebrow">Submission</span>
+        <h1>{{ s.title }}</h1>
+        <p class="view-sub">Submitted by {{ s.student.get_full_name|default:s.student.username }} ({{ s.student.username }}) on {{ s.created_at|date:"M j, Y" }}</p>
+    </div>
+    <div class="view-meta">
+        <strong>{{ s.display_score }}</strong>
+        <span>Score</span>
+        {% if s.status == 'submitted' %}
+        <div style="margin-top:8px;"><span class="tag tag-review">Awaiting review</span></div>
+        {% elif s.status == 'in_review' %}
+        <div style="margin-top:8px;"><span class="tag tag-marked">In review</span></div>
+        {% elif s.status == 'reviewed' %}
+        <div style="margin-top:8px;"><span class="tag tag-resolved">Reviewed</span></div>
+        {% endif %}
+    </div>
+</div>
+
+{% if can_review %}
+<p style="margin-top:12px;"><a class="btn btn-ghost" href="{% url 'review_submission' s.id %}">Open review tools</a></p>
+{% endif %}
+
+<div class="divider"></div>
+
+<div class="manuscript">
+    <div class="manuscript-body">{{ s.content }}</div>
+</div>
+
+<div style="margin-top:28px;">
+    <h3 style="font-size:17px; margin-bottom:14px;">{% if s.teacher_feedback %}Teacher feedback{% else %}AI feedback{% endif %}</h3>
+    <div class="manuscript">
+        <div class="manuscript-body">{{ s.display_feedback|linebreaksbr }}</div>
+    </div>
+</div>
+
+<div class="marginalia" style="margin-top:36px;">
+    <div class="marginalia-heading">Comments ({{ comments|length }})</div>
+
+    {% for c in comments %}
+    <div class="note">
+        <div class="note-meta">
+            <span class="note-author">{{ c.author.get_full_name|default:c.author.username }}</span>
+            <span>{{ c.created_at|date:"M j, Y g:i A" }}</span>
+        </div>
+        <div class="note-text">{{ c.body|linebreaksbr }}</div>
+    </div>
+    {% empty %}
+    <p style="color:var(--ink-soft); font-size:14px;">No comments yet.</p>
+    {% endfor %}
+
+    {% if can_comment %}
+    <form method="post" style="margin-top:10px;">
+        {% csrf_token %}
+        <div class="field">
+            <label for="id_comment_body">Add a comment</label>
+            <textarea id="id_comment_body" name="comment_body" rows="3" placeholder="Leave a note for the student..." required></textarea>
+        </div>
+        <button type="submit" class="btn btn-ghost">Post comment</button>
+    </form>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Writing Feedback Portal{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Manrope:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+</head>
+
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <a class="brand" href="{% url 'login' %}">
+        <span class="brand-mark">WF</span>
+        <span>
+          <strong>Writing Feedback Portal</strong>
+          <small>Student submission workspace</small>
+        </span>
+      </a>
+      <nav class="topbar-links">
+        {% if user.is_authenticated %}
+        <a href="{% url 'logout' %}">Logout</a>
+        {% endif %}
+        {% block topbar_links %}{% endblock %}
+      </nav>
+    </header>
+
+    <main class="page">
+      {% if messages %}
+      <section class="flash-stack" aria-live="polite">
+        {% for message in messages %}
+        <div class="flash flash-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+      </section>
+      {% endif %}
+
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</body>
+
+</html>

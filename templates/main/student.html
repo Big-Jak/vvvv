@@ -1,0 +1,76 @@
+{% extends 'main/base.html' %}
+{% block title %}Your drafts | Writing Feedback Portal{% endblock %}
+{% block content %}
+<div class="view-header">
+    <div>
+        <span class="view-eyebrow">Your drafts</span>
+        <h1>Your drafts</h1>
+        <p class="view-sub">Submit a draft below and get instant AI feedback, followed by teacher review.</p>
+    </div>
+    <div class="view-meta">
+        <strong>{{ essays|length }}</strong>
+        <span>Drafts</span>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<div class="manuscript" style="margin-bottom:40px;">
+    <h2 style="font-size:20px; margin-bottom:20px;">New submission</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="field">
+            <label for="id_title">Title</label>
+            <input type="text" id="id_title" name="title" placeholder="e.g. The Case for Renewable Energy" required>
+        </div>
+
+        <div class="field">
+            <label for="id_content">Paste your essay text</label>
+            <textarea id="id_content" name="content" rows="10" placeholder="Paste your draft here, or upload a PDF below instead."></textarea>
+        </div>
+
+        <div class="field">
+            <label for="id_pdf_file">…or upload a PDF</label>
+            <input type="file" id="id_pdf_file" name="pdf_file" accept="application/pdf">
+        </div>
+
+        <div class="field">
+            <label for="id_grading_prompt">Assignment instructions (optional)</label>
+            <textarea id="id_grading_prompt" name="grading_prompt" rows="3" placeholder="Any specific rubric or prompt the teacher gave you — the AI will grade against this too."></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit for feedback</button>
+    </form>
+</div>
+
+<div class="divider"></div>
+
+{% if essays %}
+<div class="submission-list">
+    {% for e in essays %}
+    <a href="{% url 'submission_detail' e.id %}" class="submission-row">
+        <div>
+            <div class="submission-title">{{ e.title }}</div>
+            <div class="submission-course">Score: {{ e.display_score }}/100</div>
+        </div>
+        <div class="submission-date">{{ e.created_at|date:"M j, Y" }}</div>
+        <div class="submission-count"><strong>{{ e.comment_count }}</strong> comments</div>
+        <div>
+            {% if e.status == 'submitted' %}
+            <span class="tag tag-review">Awaiting review</span>
+            {% elif e.status == 'in_review' %}
+            <span class="tag tag-marked">In review</span>
+            {% elif e.status == 'reviewed' %}
+            <span class="tag tag-resolved">Reviewed</span>
+            {% endif %}
+        </div>
+    </a>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <h3>No drafts yet</h3>
+    <p>Use the form above to submit your first draft.</p>
+</div>
+{% endif %}
+{% endblock %}

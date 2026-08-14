@@ -1,0 +1,30 @@
+{% extends 'main/base.html' %} {% block title %}Log in | Writing Feedback Portal{% endblock %} {% block content %}
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <span class="view-eyebrow">Account</span>
+        <h1 class="heading">Welcome back.</h1>
+        <p class="subheading">Sign in to continue to your Writing Feedback workspace.</p>
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+            <div class="field">
+                <label for="id_username">Email or username</label>
+                <input type="text" name="username" id="id_username" required autofocus>
+            </div>
+
+            <div class="field">
+                <label for="id_password">Password</label>
+                <input type="password" name="password" id="id_password" required>
+            </div>
+
+            <div class="auth-actions">
+                <button type="submit" class="btn btn-primary">Log in</button>
+                <div style="margin-left:auto; text-align:right;">
+                    <a class="quiet-link" href="{% url 'password_reset' %}">Forgot your password?</a><br>
+                    <a class="quiet-link" href="{% url 'signup' %}">New here? Create an account</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
