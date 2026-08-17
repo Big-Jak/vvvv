@@ -144,19 +144,13 @@ MEDIA_ROOT = BASE_DIR / "media"
 # the local filesystem doesn't survive between requests. If AWS_STORAGE_BUCKET_NAME
 # is set, switch the default file storage to S3; otherwise (e.g. local dev,
 # Render with its persistent disk) fall back to the local filesystem as before.
-AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME")
+CLOUDINARY_URL = os.getenv("CLOUDINARY_URL")
+
 if AWS_STORAGE_BUCKET_NAME:
-    AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
-    AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
-    AWS_S3_REGION_NAME = os.getenv("AWS_S3_REGION_NAME", "auto")
-    # AWS_S3_ENDPOINT_URL lets this point at any S3-compatible provider
-    # (e.g. Cloudflare R2, Backblaze B2) instead of AWS itself.
-    AWS_S3_ENDPOINT_URL = os.getenv("AWS_S3_ENDPOINT_URL") or None
-    AWS_S3_CUSTOM_DOMAIN = os.getenv("AWS_S3_CUSTOM_DOMAIN") or None
-    AWS_DEFAULT_ACL = None
-    AWS_S3_FILE_OVERWRITE = False
-    AWS_QUERYSTRING_AUTH = False
+    # ... your existing S3 block stays exactly the same ...
     STORAGES["default"] = {"BACKEND": "storages.backends.s3.S3Storage"}
+elif CLOUDINARY_URL:
+    STORAGES["default"] = {"BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage"}
 else:
     STORAGES["default"] = {"BACKEND": "django.core.files.storage.FileSystemStorage"}
 
