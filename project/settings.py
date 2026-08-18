@@ -36,9 +36,9 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
-    "cloudinary_storage", 
+    "cloudinary_storage",
     "django.contrib.staticfiles",
-    "cloudinary",         
+    "cloudinary",
     "main.apps.MainConfig",
 ]
 
@@ -140,14 +140,25 @@ MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
 # On Vercel (and any other platform without persistent local disk), uploaded
-# files must go to S3-compatible object storage instead of MEDIA_ROOT, since
-# the local filesystem doesn't survive between requests. If AWS_STORAGE_BUCKET_NAME
-# is set, switch the default file storage to S3; otherwise (e.g. local dev,
-# Render with its persistent disk) fall back to the local filesystem as before.
+# files must go to object storage instead of MEDIA_ROOT, since the local
+# filesystem doesn't survive between requests / is read-only at runtime.
+# Priority: S3-compatible storage (if AWS_STORAGE_BUCKET_NAME is set) takes
+# precedence, then Cloudinary (if CLOUDINARY_URL is set), then local
+# filesystem as a last resort (local dev, or a host with persistent disk).
 CLOUDINARY_URL = os.getenv("CLOUDINARY_URL")
 
+AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME")
 if AWS_STORAGE_BUCKET_NAME:
-    # ... your existing S3 block stays exactly the same ...
+    AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
+    AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
+    AWS_S3_REGION_NAME = os.getenv("AWS_S3_REGION_NAME", "auto")
+    # AWS_S3_ENDPOINT_URL lets this point at any S3-compatible provider
+    # (e.g. Cloudflare R2, Backblaze B2) instead of AWS itself.
+    AWS_S3_ENDPOINT_URL = os.getenv("AWS_S3_ENDPOINT_URL") or None
+    AWS_S3_CUSTOM_DOMAIN = os.getenv("AWS_S3_CUSTOM_DOMAIN") or None
+    AWS_DEFAULT_ACL = None
+    AWS_S3_FILE_OVERWRITE = False
+    AWS_QUERYSTRING_AUTH = False
     STORAGES["default"] = {"BACKEND": "storages.backends.s3.S3Storage"}
 elif CLOUDINARY_URL:
     STORAGES["default"] = {"BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage"}
@@ -155,5 +166,3 @@ else:
     STORAGES["default"] = {"BACKEND": "django.core.files.storage.FileSystemStorage"}
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage
